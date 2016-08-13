@@ -97,50 +97,50 @@ namespace Derprecated.ShopifyMigrator
             {
                 db.CreateTableIfNotExists<Product>();
                 db.CreateTableIfNotExists<ProductMeta>();
+                db.CreateTableIfNotExists<ProductVariant>();
+                db.CreateTableIfNotExists<ProductVariantMeta>();
             }
         }
 
         private static void Main(string[] args)
         {
             using (var client = Container.Resolve<JsonServiceClient>())
-            using (var db = Container.Resolve<IDbConnectionFactory>().Open())
             {
                 Console.WriteLine(@"Requesting latest product counts...");
 
                 var shopifyCount = client.Get(new GetProductsCount());
-                var dbCount = db.Count<Product>();
 
-                Console.WriteLine($"Found\n\tShopify: {shopifyCount.Count}\n\tDb: {dbCount}\n");
+                Console.WriteLine($"Found\n\tShopify: {shopifyCount.Count}\n");
                 Console.WriteLine("Merging...\n");
 
                 var shopifyProducts = client.Get(new GetProducts {Limit = shopifyCount.Count});
 
-                var products = shopifyProducts.Products.Map(p =>
+                var count = shopifyProducts.Products.AsParallel().Select(p =>
                 {
-                    // ReSharper disable once AccessToDisposedClosure
-                    var product = db.Where<Product>(new {ShopifyId = p.Id}).SingleOrDefault();
-
-                    if (product == default(Product))
+                    Product product;
+                    using (var db = Container.Resolve<IDbConnectionFactory>().Open())
                     {
-                        product = Product.From(p);
-                        Console.WriteLine($"New [{product.ShopifyId}] {p.Title.Truncate(40)}...");
-                    }
-                    else
-                    {
-                        db.LoadReferences(product);
-                        product.Merge(p);
-                        Console.WriteLine($"Existing [{product.ShopifyId} -> {product.Id}] {p.Title.Truncate(40)}...");
-                    }
+                        product = db.Where<Product>(new {ShopifyId = p.Id}).SingleOrDefault();
 
+                        if (product == default(Product))
+                        {
+                            product = Product.From(p);
+                            Console.WriteLine($"New [{product.ShopifyId}] {p.Title.Truncate(40)}...");
+                        }
+                        else
+                        {
+                            db.LoadReferences(product);
+                            product.Merge(p);
+                            Console.WriteLine(
+                                $"Existing [{product.ShopifyId} -> {product.Id}] {p.Title.Truncate(40)}...");
+                        }
+
+                        db.Save(product, true);
+                    }
                     return product;
-                });
+                }).Count();
 
-                Console.WriteLine("Saving...\n");
-
-                // ReSharper disable once AccessToDisposedClosure
-                var results = products.Map(p => db.Save(p, true)).Count();
-
-                Console.WriteLine($"Saved {results} Products.\n");
+                Console.WriteLine($"Saved {count} Products.\n");
             }
             Console.WriteLine(@"DONE");
             Console.WriteLine(@"Press any key to quit...");
