@@ -37,6 +37,7 @@ namespace Derprecated.ShopifyMigrator.Models.Dto
 
         public List<string> Tags { get; set; }
 
+        [DataMember(Name = "variants")]
         public List<ProductVariant> Variants { get; set; }
 
         public List<ProductOption> Options { get; set; }

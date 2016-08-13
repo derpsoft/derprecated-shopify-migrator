@@ -63,6 +63,11 @@ namespace Derprecated.ShopifyMigrator
                     var product = row as Product;
                     product.OnInsert();
                 }
+                else if (row is ProductVariant)
+                {
+                    var variant = row as ProductVariant;
+                    variant.OnInsert();
+                }
             };
             OrmLiteConfig.UpdateFilter = (dbCmd, row) =>
             {
@@ -76,6 +81,11 @@ namespace Derprecated.ShopifyMigrator
                 {
                     var product = row as Product;
                     product.OnUpdate();
+                }
+                else if (row is ProductVariant)
+                {
+                    var variant = row as ProductVariant;
+                    variant.OnUpdate();
                 }
             };
 
@@ -131,6 +141,8 @@ namespace Derprecated.ShopifyMigrator
                         {
                             db.LoadReferences(product);
                             product.Merge(p);
+
+
                             Console.WriteLine(
                                 $"Existing [{product.ShopifyId} -> {product.Id}] {p.Title.Truncate(40)}...");
                         }

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ServiceStack;
 using ServiceStack.DataAnnotations;
 
 namespace Derprecated.ShopifyMigrator.Models
 {
     public class Product : IAuditable
     {
-        private List<ProductMeta> _meta;
-
         public Product()
         {
-            MetaDictionary = new Dictionary<string, ProductMeta>();
+            Variants = new List<ProductVariant>();
+            Meta = new ProductMeta();
         }
 
         [PrimaryKey]
@@ -21,43 +19,15 @@ namespace Derprecated.ShopifyMigrator.Models
 
         public long ShopifyId { get; set; }
 
-        [Ignore]
-        public List<string> Fields => MetaDictionary.Keys.ToList();
-
-        [Ignore]
-        public string Title => Get("title", string.Empty);
-
-        [Ignore]
-        public string Description => Get("description", string.Empty);
-
-        private Dictionary<string, ProductMeta> MetaDictionary { get; set; }
+        public ProductMeta Meta { get; set; }
 
         [Reference]
-        public List<ProductMeta> Meta
-        {
-            get { return _meta; }
-            set
-            {
-                _meta = value;
-                MetaDictionary = value.ToSafeDictionary(m => m.Key);
-            }
-        }
+        public List<ProductVariant> Variants { get; set; }
 
         public DateTime CreateDate { get; set; }
         public DateTime ModifyDate { get; set; }
         public ulong RowVersion { get; set; }
 
-        private void Set(string key, object value)
-        {
-            var meta = MetaDictionary.GetOrAdd(key.ToLowerInvariant(), k => new ProductMeta {Key = k});
-            meta.Set(value);
-        }
-
-        private T Get<T>(string key, T fallback = default(T))
-        {
-            var m = MetaDictionary.GetValueOrDefault(key.ToLowerInvariant());
-            return m == default(ProductMeta) ? fallback : m.Get<T>();
-        }
 
         /// <summary>
         ///     Merge fields from source into this.
@@ -65,8 +35,22 @@ namespace Derprecated.ShopifyMigrator.Models
         /// <param name="source"></param>
         public void Merge(Dto.Product source)
         {
-            Set("title", source.Title);
-            Set("description", source.BodyHtml);
+            Meta.Title = source.Title;
+            Meta.Description = source.BodyHtml;
+
+            foreach (var pv in source.Variants)
+            {
+                var v = Variants.FirstOrDefault(x => x.ShopifyId == pv.Id);
+
+                if (default(ProductVariant) == v)
+                {
+                    Variants.Add(ProductVariant.From(pv));
+                }
+                else
+                {
+                    v.Merge(pv);
+                }
+            }
         }
 
         public static Product From(Dto.Product source)
@@ -90,7 +74,6 @@ namespace Derprecated.ShopifyMigrator.Models
 
         private void OnUpsert()
         {
-            _meta = MetaDictionary.Values.ToList();
         }
     }
 }
