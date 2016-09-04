@@ -106,9 +106,7 @@ namespace Derprecated.ShopifyMigrator
             using (var db = Container.Resolve<IDbConnectionFactory>().Open())
             {
                 db.CreateTableIfNotExists<Product>();
-                db.CreateTableIfNotExists<ProductMeta>();
                 db.CreateTableIfNotExists<ProductVariant>();
-                db.CreateTableIfNotExists<ProductVariantMeta>();
             }
         }
 
@@ -155,8 +153,8 @@ namespace Derprecated.ShopifyMigrator
                 Console.WriteLine($"Saved {count} Products.\n");
             }
             Console.WriteLine(@"DONE");
-            Console.WriteLine(@"Press any key to quit...");
-            Console.ReadKey();
+            Console.WriteLine(@"Newline to quit...");
+            Console.ReadLine();
         }
     }
 }

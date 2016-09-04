@@ -35,7 +35,8 @@ namespace Derprecated.ShopifyMigrator.Models.Dto
         [DataMember(Name = "published_at")]
         public DateTimeOffset PublishedAt { get; set; }
 
-        public List<string> Tags { get; set; }
+        [DataMember(Name = "tags")]
+        public string Tags { get; set; }
 
         [DataMember(Name = "variants")]
         public List<ProductVariant> Variants { get; set; }

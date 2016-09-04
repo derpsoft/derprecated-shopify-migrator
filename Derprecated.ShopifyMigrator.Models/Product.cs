@@ -37,6 +37,7 @@ namespace Derprecated.ShopifyMigrator.Models
         {
             Meta.Title = source.Title;
             Meta.Description = source.BodyHtml;
+            Meta.Tags = source.Tags;
 
             foreach (var pv in source.Variants)
             {
