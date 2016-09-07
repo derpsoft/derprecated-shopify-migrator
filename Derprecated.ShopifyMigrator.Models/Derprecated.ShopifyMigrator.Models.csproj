@@ -74,9 +74,12 @@
     <Compile Include="Dto\ProductOption.cs" />
     <Compile Include="Dto\ProductVariant.cs" />
     <Compile Include="IAuditable.cs" />
+    <Compile Include="IInsertFilter.cs" />
     <Compile Include="IPublishable.cs" />
+    <Compile Include="IUpdateFilter.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="ProductMeta.cs" />
+    <Compile Include="ProductTag.cs" />
     <Compile Include="ProductVariant.cs" />
     <Compile Include="ProductVariantMeta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Route\GetProductsCountResponse.cs" />
     <Compile Include="Route\GetProductsResponse.cs" />
     <Compile Include="Route\GetProductsValidator.cs" />
+    <Compile Include="Tag.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

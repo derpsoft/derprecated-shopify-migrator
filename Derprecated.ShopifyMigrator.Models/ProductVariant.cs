@@ -3,7 +3,7 @@ using ServiceStack.DataAnnotations;
 
 namespace Derprecated.ShopifyMigrator.Models
 {
-    public class ProductVariant : IAuditable
+    public class ProductVariant : IAuditable, IInsertFilter, IUpdateFilter
     {
         public ProductVariant()
         {
@@ -50,12 +50,12 @@ namespace Derprecated.ShopifyMigrator.Models
             return dest;
         }
 
-        public void OnInsert()
+        public void OnBeforeInsert()
         {
             OnUpsert();
         }
 
-        public void OnUpdate()
+        public void OnBeforeUpdate()
         {
             OnUpsert();
         }
