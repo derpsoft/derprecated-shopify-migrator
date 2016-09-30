@@ -11,6 +11,7 @@ namespace Derprecated.ShopifyMigrator.Models
         {
             Variants = new List<ProductVariant>();
             Meta = new ProductMeta();
+            Images = new List<ProductImage>();
         }
 
         [PrimaryKey]
@@ -23,6 +24,9 @@ namespace Derprecated.ShopifyMigrator.Models
 
         [Reference]
         public List<ProductVariant> Variants { get; set; }
+
+        [Reference]
+        public List<ProductImage> Images { get; set; }
 
         public DateTime CreateDate { get; set; }
         public DateTime ModifyDate { get; set; }
@@ -50,6 +54,20 @@ namespace Derprecated.ShopifyMigrator.Models
                 else
                 {
                     v.Merge(pv);
+                }
+            }
+
+            foreach (var img in source.Images)
+            {
+                var i = Images.FirstOrDefault(x => x.ShopifyId == img.Id);
+
+                if (default(ProductImage) == i)
+                {
+                    Images.Add(ProductImage.From(img));
+                }
+                else
+                {
+                    i.Merge(img);
                 }
             }
         }

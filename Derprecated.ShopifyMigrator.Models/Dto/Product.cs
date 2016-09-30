@@ -43,6 +43,7 @@ namespace Derprecated.ShopifyMigrator.Models.Dto
 
         public List<ProductOption> Options { get; set; }
 
+        [DataMember(Name = "images")]
         public List<ProductImage> Images { get; set; }
     }
 }

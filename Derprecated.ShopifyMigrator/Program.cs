@@ -103,6 +103,7 @@ namespace Derprecated.ShopifyMigrator
                 db.CreateTableIfNotExists<Product>();
                 db.CreateTableIfNotExists<ProductVariant>();
                 db.CreateTableIfNotExists<ProductTag>();
+                db.CreateTableIfNotExists<ProductImage>();
             }
         }
 
